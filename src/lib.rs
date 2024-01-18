@@ -72,6 +72,8 @@ pub struct ArtifactDependency {
     pub target_name: String,
     #[builder(setter(into), default)]
     pub capture_output: bool,
+    #[builder(setter(into, strip_option), default)]
+    pub env: Option<Vec<(String, String)>>,
 }
 
 // NOTE: Artifact naming is not very easy to discern, we have to dig hard into rustc.
@@ -271,6 +273,10 @@ impl ArtifactDependency {
             }
 
             cargo_command.arg(format!("--features={}", self.features.join(",")));
+
+            if let Some(env) = self.env.as_ref() {
+                cargo_command.envs(env.iter().cloned());
+            }
 
             if self.capture_output {
                 let output = cargo_command
