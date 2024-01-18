@@ -70,6 +70,8 @@ pub struct ArtifactDependency {
     pub features: Vec<String>,
     #[builder(setter(into))]
     pub target_name: String,
+    #[builder(setter(into), default)]
+    pub capture_output: bool,
 }
 
 // NOTE: Artifact naming is not very easy to discern, we have to dig hard into rustc.
@@ -265,17 +267,25 @@ impl ArtifactDependency {
 
             cargo_command.arg(format!("--features={}", self.features.join(",")));
 
-            let output = cargo_command
-                .stderr(Stdio::piped())
-                .stdout(Stdio::piped())
-                .output()?;
+            if self.capture_output {
+                let output = cargo_command
+                    .stderr(Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .output()?;
 
-            if !output.status.success() {
-                bail!(
-                    "Failed to build artifact crate:\nstdout: {}\nstderr: {}",
-                    String::from_utf8_lossy(&output.stdout),
-                    String::from_utf8_lossy(&output.stderr)
-                );
+                if !output.status.success() {
+                    bail!(
+                        "Failed to build artifact crate:\nstdout: {}\nstderr: {}",
+                        String::from_utf8_lossy(&output.stdout),
+                        String::from_utf8_lossy(&output.stderr)
+                    );
+                }
+            } else {
+                let status = cargo_command.status()?;
+
+                if !status.success() {
+                    bail!("Failed to build artifact crate");
+                }
             }
 
             let artifact_path: PathBuf = build_target_dir
