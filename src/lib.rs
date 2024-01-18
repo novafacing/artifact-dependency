@@ -199,8 +199,13 @@ impl ArtifactDependency {
             .find(|p| p.name == crate_name)
             .ok_or_else(|| {
                 anyhow!(
-                    "No package matching name {} found in workspace at {}",
+                    "No package matching name {} found in packages {:?} workspace at {}",
                     crate_name,
+                    metadata
+                        .packages
+                        .iter()
+                        .map(|p| p.name.clone())
+                        .collect::<Vec<_>>(),
                     workspace_root.display()
                 )
             })?;
