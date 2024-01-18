@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Intel Corporation
+// Copyright (C) 2023 Intel Corporation, Rowan Hart
 // SPDX-License-Identifier: Apache-2.0
 
 //! Feature-light crate to build and use dependencies whose results are Artifacts:
