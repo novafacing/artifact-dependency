@@ -1,0 +1,15 @@
+[package]
+name = "artifact-dependency"
+version = "0.1.0"
+edition = "2021"
+description = "Lightweight artifact dependency utilities"
+license = "Apache-2.0"
+repository = "https://github.com/novafacing/artifact-dependency"
+publish = true
+
+
+[dependencies]
+anyhow = "1.0.79"
+cargo_metadata = "0.18.1"
+serde = { version = "1.0.195", features = ["derive"] }
+typed-builder = "0.18.1"
