@@ -177,6 +177,8 @@ impl ArtifactDependency {
 
         self.crate_name = if let Some(crate_name) = self.crate_name.as_ref() {
             Some(crate_name.clone())
+        } else if let Ok(crate_name) = var("CARGO_PKG_NAME") {
+            Some(crate_name)
         } else if let Some(root_package) = metadata.root_package() {
             Some(root_package.name.clone())
         } else {
