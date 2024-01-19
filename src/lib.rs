@@ -17,6 +17,7 @@ use std::{
     hash::{Hash, Hasher},
     path::PathBuf,
     process::{Command, Stdio},
+    str::FromStr,
 };
 use typed_builder::TypedBuilder;
 
@@ -42,6 +43,19 @@ pub enum Profile {
     Other(String),
 }
 
+impl FromStr for Profile {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        match s {
+            "release" => Ok(Self::Release),
+            "dev" => Ok(Self::Dev),
+            "debug" => Ok(Self::Dev),
+            _ => Ok(Self::Other(s.to_string())),
+        }
+    }
+}
+
 #[derive(TypedBuilder, Clone, Debug)]
 /// Builder to find and optionally build an artifact dependency from a particular workspace
 pub struct ArtifactDependency {
@@ -56,9 +70,9 @@ pub struct ArtifactDependency {
     pub crate_name: Option<String>,
     /// Type of artifact to build.
     pub artifact_type: CrateType,
-    #[builder(setter(into, strip_option), default)]
+    #[builder(setter(into))]
     /// Profile, defaults to the current profile
-    pub profile: Option<Profile>,
+    pub profile: Profile,
     /// Build the artifact if it is missing
     pub build_missing: bool,
     #[builder(default = true)]
@@ -68,8 +82,8 @@ pub struct ArtifactDependency {
     pub build_always: bool,
     #[builder(setter(into), default)]
     pub features: Vec<String>,
-    #[builder(setter(into))]
-    pub target_name: String,
+    #[builder(setter(into, strip_option), default)]
+    pub target_name: Option<String>,
     #[builder(setter(into), default)]
     pub capture_output: bool,
     #[builder(setter(into, strip_option), default)]
@@ -108,11 +122,6 @@ const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("", ".dll", "", ".li
     target = "i686-pc-windows-gnu"
 ))]
 const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("", ".dll", "lib", ".a", ".exe");
-
-#[cfg(debug_assertions)]
-const PROFILE: Profile = Profile::Dev;
-#[cfg(not(debug_assertions))]
-const PROFILE: Profile = Profile::Release;
 
 #[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq)]
 /// A built artifact
@@ -218,7 +227,7 @@ impl ArtifactDependency {
         let (dll_prefix, dll_suffix, staticlib_prefix, staticlib_suffix, exe_suffix) =
             ARTIFACT_NAMEPARTS;
 
-        let profile = self.profile.clone().unwrap_or(PROFILE);
+        let profile = self.profile.clone();
 
         let profile_target_path = metadata.target_directory.join(match &profile {
             Profile::Release => "release".to_string(),
@@ -258,7 +267,11 @@ impl ArtifactDependency {
             // TODO: This will solve one build script trying to build the artifact at
             // once, but doesn't resolve parallel scripts trying to both build it
             // simultaneously, we need to actually detect the lock.
-            let build_target_dir = metadata.target_directory.join(&self.target_name);
+            let build_target_dir = if let Some(target_name) = self.target_name.as_ref() {
+                metadata.target_directory.join(target_name)
+            } else {
+                metadata.target_directory
+            };
 
             cargo_command.arg("--target-dir").arg(&build_target_dir);
 
