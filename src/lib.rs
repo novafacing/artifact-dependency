@@ -106,22 +106,22 @@ pub struct ArtifactDependency {
 // | Windows GNULLVM |            | .dll       | .exe       | lib (d)          | .a (d)           |
 
 #[cfg(target_family = "unix")]
-const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("lib", ".so", "lib", ".a", "");
+pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("lib", ".so", "lib", ".a", "");
 #[cfg(target_family = "darwin")]
-const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("lib", ".dylib", "lib", ".a", "");
+pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("lib", ".dylib", "lib", ".a", "");
 #[cfg(any(
     target = "x86_64_pc-windows-msvc",
     target = "aarch64-pc-windows-msvc",
     target = "i586-pc-windows-msvc",
     target = "i686-pc-windows-msvc"
 ))]
-const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("", ".dll", "", ".lib", ".exe");
+pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("", ".dll", "", ".lib", ".exe");
 #[cfg(any(
     target = "x86_64_pc-windows-gnu",
     target = "i586-pc-windows-gnu",
     target = "i686-pc-windows-gnu"
 ))]
-const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("", ".dll", "lib", ".a", ".exe");
+pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("", ".dll", "lib", ".a", ".exe");
 
 #[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq)]
 /// A built artifact
