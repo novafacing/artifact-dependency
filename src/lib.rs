@@ -106,21 +106,16 @@ pub struct ArtifactDependency {
 // | Windows GNULLVM |            | .dll       | .exe       | lib (d)          | .a (d)           |
 
 #[cfg(target_family = "unix")]
+/// The dll prefix, dll suffix, staticlib prefix, staticlib suffix, and exe suffix for the current target
 pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("lib", ".so", "lib", ".a", "");
 #[cfg(target_family = "darwin")]
+/// The dll prefix, dll suffix, staticlib prefix, staticlib suffix, and exe suffix for the current target
 pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("lib", ".dylib", "lib", ".a", "");
-#[cfg(any(
-    target = "x86_64-pc-windows-msvc",
-    target = "aarch64-pc-windows-msvc",
-    target = "i586-pc-windows-msvc",
-    target = "i686-pc-windows-msvc"
-))]
+#[cfg(all(target_os = "windows", target_env = "msvc"))]
+/// The dll prefix, dll suffix, staticlib prefix, staticlib suffix, and exe suffix for the current target
 pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("", ".dll", "", ".lib", ".exe");
-#[cfg(any(
-    target = "x86_64-pc-windows-gnu",
-    target = "i586-pc-windows-gnu",
-    target = "i686-pc-windows-gnu"
-))]
+#[cfg(all(target_os = "windows", any(target_env = "gnu", target_env = "gnullvm")))]
+/// The dll prefix, dll suffix, staticlib prefix, staticlib suffix, and exe suffix for the current target
 pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("", ".dll", "lib", ".a", ".exe");
 
 #[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq)]
