@@ -110,14 +110,14 @@ pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("lib", ".so", "l
 #[cfg(target_family = "darwin")]
 pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("lib", ".dylib", "lib", ".a", "");
 #[cfg(any(
-    target = "x86_64_pc-windows-msvc",
+    target = "x86_64-pc-windows-msvc",
     target = "aarch64-pc-windows-msvc",
     target = "i586-pc-windows-msvc",
     target = "i686-pc-windows-msvc"
 ))]
 pub const ARTIFACT_NAMEPARTS: (&str, &str, &str, &str, &str) = ("", ".dll", "", ".lib", ".exe");
 #[cfg(any(
-    target = "x86_64_pc-windows-gnu",
+    target = "x86_64-pc-windows-gnu",
     target = "i586-pc-windows-gnu",
     target = "i686-pc-windows-gnu"
 ))]
